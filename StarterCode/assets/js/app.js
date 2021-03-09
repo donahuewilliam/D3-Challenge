@@ -76,7 +76,7 @@ function updateToolTip(povertyXAxis, healthcareYAxis, circlesGroup, textGroup) {
                 }      
         });
     circlesGroup.call(toolTip);
-    // Create "mouseover" event listener to display tool tip.
+    // Create mouseover and out event listener
     circlesGroup
         .on("mouseover", function(data) {
             toolTip.show(data, this);
@@ -96,74 +96,62 @@ function updateToolTip(povertyXAxis, healthcareYAxis, circlesGroup, textGroup) {
 function makeResponsive() {
     // Select div by id.
     var svgArea = d3.select("#scatter").select("svg");
-    // Clear SVG.
     if (!svgArea.empty()) {
         svgArea.remove();
     }
-    //SVG params.
     var svgHeight = window.innerHeight/1.2;
     var svgWidth = window.innerWidth/1.7;
-    // Margins.
     var margin = {
         top: 50,
         right: 50,
         bottom: 100,
         left: 80
     };
-    // Chart area minus margins.
     var chartHeight = svgHeight - margin.top - margin.bottom;
     var chartWidth = svgWidth - margin.left - margin.right;
-    // Create an SVG wrapper, append an SVG group that will hold our chart,
-    // and shift the latter by left and top margins.
+    // Create an SVG using d3
     var svg = d3
     .select("#scatter")
     .append("svg")
     .attr("width", svgWidth)
     .attr("height", svgHeight);
-    // Append an SVG group
     var chartGroup = svg.append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    //import csv
     d3.csv("assets/data/data.csv").then(function(demoData, err) {
         if (err) throw err;
-        // Parse data.
         demoData.forEach(function(data) {
             data.poverty = +data.poverty;
             data.healthcare = +data.healthcare;
         });
-        // Create x/y linear scales.
+        // Create x and y linear scales.
         var xLinearScale = xScale(demoData, povertyXAxis, chartWidth);
         var yLinearScale = yScale(demoData, healthcareYAxis, chartHeight);
-        // Create initial axis functions.
         var rightAxis =d3.axisBottom(xLinearScale);
         var leftAxis = d3.axisLeft(yLinearScale);
-        // Append x axis.
         var xAxis = chartGroup.append("g")
             .attr("transform", `translate(0, ${chartHeight})`)
             .call(rightAxis);
-        // Append y axis.
         var yAxis = chartGroup.append("g")
             .call(leftAxis);
-        // Set data used for circles.
         var circlesGroup = chartGroup.selectAll("circle")
             .data(demoData);
-        // Bind data.
         var enterBot = circlesGroup.enter();
-        // Create circles.
+        // start cirles 
         var circle = enterBot.append("circle")
             .attr("cx", d => xLinearScale(d[povertyXAxis]))
             .attr("cy", d => yLinearScale(d[healthcareYAxis]))
             .attr("r", 15)
             .classed("stateCircle", true);
-        // Create circle text.
+        //  create circle text
         var circleText = enterBot.append("text")            
             .attr("x", d => xLinearScale(d[povertyXAxis]))
             .attr("y", d => yLinearScale(d[healthcareYAxis]))
             .attr("dy", ".35em") 
             .text(d => d.abbr)
             .classed("stateText", true);
-        // Update tool tip function above csv import.
         var circlesGroup = updateToolTip(povertyXAxis, healthcareYAxis, circle, circleText);
-        // Add x label groups and labels.
+        // group x lables 
         var xLabelsGroup = chartGroup.append("g")
             .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + 20})`);
         var povertyLabel = xLabelsGroup.append("text")
@@ -172,7 +160,7 @@ function makeResponsive() {
             .attr("value", "poverty") 
             .classed("active", true)
             .text("Poverty Percentage");
-        // Add y labels group and labels.
+        // group ylabels 
         var yLabelsGroup = chartGroup.append("g")
             .attr("transform", "rotate(-90)");
         var healthcareLabel = yLabelsGroup.append("text")
@@ -186,11 +174,8 @@ function makeResponsive() {
             .on("click", function() {
                 // Grab selected label.
                 povertyXAxis = d3.select(this).attr("value");
-                // Update xLinearScale.
                 xLinearScale = xScale(demoData, povertyXAxis, chartWidth);
-                // Render xAxis.
                 xAxis = renderXAxes(xLinearScale, xAxis);
-                // Switch active/inactive labels.
                 if (povertyXAxis === "poverty") {
                     povertyLabel
                         .classed("active", true)
@@ -232,5 +217,6 @@ function makeResponsive() {
         console.log(err);
     });
 }
+//make responsive using d3
 makeResponsive();
 d3.select(window).on("resize", makeResponsive);
