@@ -52,15 +52,11 @@ function updateToolTip(povertyXAxis, healthcareYAxis, circlesGroup, textGroup) {
         var xlabel = "Poverty: ";
     } else if (povertyXAxis === "income") {
         var xlabel = "Average Income: "
-    } else {
-        var xlabel = "Age: "
     }
     if (healthcareYAxis === "healthcare") {
         var ylabel = "No Healthcare: ";
     } else if (healthcareYAxis === "smokes") {
         var ylabel = "Smokers: "
-    } else {
-        var ylabel = "Obesity: "
     }
     // Define tooltip.
     var toolTip = d3.tip()
@@ -93,8 +89,8 @@ function updateToolTip(povertyXAxis, healthcareYAxis, circlesGroup, textGroup) {
         });
     return circlesGroup;
 }
+//start svg
 function makeResponsive() {
-    // Select div by id.
     var svgArea = d3.select("#scatter").select("svg");
     if (!svgArea.empty()) {
         svgArea.remove();
@@ -102,10 +98,10 @@ function makeResponsive() {
     var svgHeight = window.innerHeight/1.2;
     var svgWidth = window.innerWidth/1.7;
     var margin = {
-        top: 50,
+        top: 100,
         right: 50,
         bottom: 100,
-        left: 80
+        left: 50
     };
     var chartHeight = svgHeight - margin.top - margin.bottom;
     var chartWidth = svgWidth - margin.left - margin.right;
@@ -144,33 +140,33 @@ function makeResponsive() {
             .attr("r", 15)
             .classed("stateCircle", true);
         //  create circle text
-        var circleText = enterBot.append("text")            
+        var text = enterBot.append("text")            
             .attr("x", d => xLinearScale(d[povertyXAxis]))
             .attr("y", d => yLinearScale(d[healthcareYAxis]))
             .attr("dy", ".35em") 
             .text(d => d.abbr)
             .classed("stateText", true);
-        var circlesGroup = updateToolTip(povertyXAxis, healthcareYAxis, circle, circleText);
+        var circlesGroup = updateToolTip(povertyXAxis, healthcareYAxis, circle, text);
         // group x lables 
-        var xLabelsGroup = chartGroup.append("g")
+        var xGroup = chartGroup.append("g")
             .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + 20})`);
-        var povertyLabel = xLabelsGroup.append("text")
+        var povertyLabel = xGroup.append("text")
             .attr("x", 0)
-            .attr("y", 20)
+            .attr("y", 30)
             .attr("value", "poverty") 
             .classed("active", true)
             .text("Poverty Percentage");
         // group ylabels 
-        var yLabelsGroup = chartGroup.append("g")
+        var yGroup = chartGroup.append("g")
             .attr("transform", "rotate(-90)");
-        var healthcareLabel = yLabelsGroup.append("text")
+        var healthcareLabel = yGroup.append("text")
             .attr("x", 0 - (chartHeight / 2))
-            .attr("y", 40 - margin.left)
+            .attr("y", 50 - margin.left)
             .attr("dy", "1em")
             .attr("value", "healthcare")
             .classed("active", true)
             .text("No Healthcare Percentage");
-        xLabelsGroup.selectAll("text")
+        xGroup.selectAll("text")
             .on("click", function() {
                 // Grab selected label.
                 povertyXAxis = d3.select(this).attr("value");
@@ -210,8 +206,8 @@ function makeResponsive() {
                         .classed("inactive", true);
                 }
                 circle = renderCircles(circlesGroup, xLinearScale, yLinearScale, povertyXAxis, healthcareYAxis);
-                circleText = renderText(circleText, xLinearScale, yLinearScale, povertyXAxis, healthcareYAxis);
-                circlesGroup = updateToolTip(povertyXAxis, healthcareYAxis, circle, circleText);
+                text = renderText(circleText, xLinearScale, yLinearScale, povertyXAxis, healthcareYAxis);
+                circlesGroup = updateToolTip(povertyXAxis, healthcareYAxis, circle, text);
             });
     }).catch(function(err) {
         console.log(err);
